@@ -1,8 +1,8 @@
 "use client";
 
 import EmptySearch from "./empty-search";
-import EmptyBoards from "./sidebar/empty-boards";
-import EmptyFavorites from "./sidebar/empty-favorites";
+import EmptyBoards from "./empty-boards";
+import EmptyFavorites from "./empty-favorites";
 
 interface BoardLisrProps {
   orgId: string;
