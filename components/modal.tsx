@@ -12,21 +12,25 @@ import {
   AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
 
-interface ConfirmModalProps {
+interface ModalProps {
   children: React.ReactNode;
   onConfirm: () => void;
+  onCancel?: () => void;
   header: string;
   disabled?: boolean;
   description?: string;
+  extraContent?: React.ReactNode;
 };
 
-const ConfirmModal = ({
+const Modal = ({
   children,
   onConfirm,
+  onCancel,
   header,
   disabled,
   description,
-}: ConfirmModalProps) => {
+  extraContent,
+}: ModalProps) => {
 
   const handleConfirm = () => {
     onConfirm();
@@ -50,10 +54,17 @@ const ConfirmModal = ({
           <AlertDialogDescription>
             {description}
           </AlertDialogDescription>
+
+          {extraContent}
+
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel
+            onClick={onCancel || undefined}
+          >
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             disabled={disabled}
             onClick={handleConfirm}
@@ -68,4 +79,4 @@ const ConfirmModal = ({
   );
 };
 
-export default ConfirmModal;
+export default Modal;
