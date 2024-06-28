@@ -63,7 +63,7 @@ const BoardCard = ({
 
 
   return (
-    <Link href={`/baord/${id}`}>
+    <Link href={`/board/${id}`}>
       <div
         className="group aspect-[100/127] border rounded-lg flex flex-col justify-between overflow-hidden"
       >
