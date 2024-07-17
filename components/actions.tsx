@@ -1,21 +1,19 @@
 "use cliente";
 
-import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
+import { UpdateModal } from "@/app/(dashboard)/_components/update-modal";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Link2, Pencil, Trash2 } from "lucide-react";
-import { useApiMutation } from "@/hooks/use-api-mutation";
 import { api } from "@/convex/_generated/api";
+import { useApiMutation } from "@/hooks/use-api-mutation";
+import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
+import { Link2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Modal from "./modal";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
 
 interface ActionsProps {
   children: React.ReactNode;
@@ -32,17 +30,8 @@ const Actions = ({
   side,
   sideOffset,
 }: ActionsProps) => {
-  const [newTitle, setNewTitle] = useState(title);
-
-  useEffect(() => {
-    setNewTitle(title); 
-  }, [title]);
 
   const { mutate, pending } = useApiMutation(api.board.remove);
-  const {
-    mutate: mutatePath,
-    pending: pendingPath
-  } = useApiMutation(api.board.update);
 
   const onDelete = () => {
     mutate({ id })
@@ -54,15 +43,6 @@ const Actions = ({
     navigator.clipboard.writeText(
       `${window.location.origin}/board/${id}`
     )
-  };
-
-  const onSubmit = () => {
-    mutatePath({ id, title: newTitle })
-      .then(() => {
-        toast.success("Board renamed");
-        setNewTitle(newTitle);
-      })
-      .catch(() => toast.error("Failed to rename board"))
   };
 
   return (
@@ -86,43 +66,18 @@ const Actions = ({
           Copy board link
         </DropdownMenuItem>
 
-        {/* <DropdownMenuItem 
-          onClick={() => onOpen(id, title)}
-          className="p-3 cursor-pointer"
-        >
-          <Pencil className="h-4 w-4 mr-2" />
-          Rename
-        </DropdownMenuItem> */}
-
-        <Modal
-          header="Edit board title"
-          description="Edit a new title for this board."
-          disabled={pendingPath || newTitle.trim().length === 0 || title === newTitle}
-          onConfirm={onSubmit}
-          onCancel={() => {
-            setNewTitle(title);
-            return undefined;
-          }}
-          extraContent={
-            <Input
-              disabled={pendingPath}
-              required
-              maxLength={60}
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Board title"
-            />
-          }
+        <UpdateModal
+          id={id}
+          title={title}
         >
           <Button
             variant="ghost"
-            // onClick={onDelete}
             className="p-3 cursor-pointer text-sm w-full justify-start font-normal"
           >
-          <Pencil className="h-4 w-4 mr-2" />
-          Rename
+            <Pencil className="h-4 w-4 mr-2" />
+            Rename
           </Button>
-        </Modal>
+        </UpdateModal>
 
         <Modal
           header="Delete board?"
@@ -132,7 +87,6 @@ const Actions = ({
         >
           <Button
             variant="ghost"
-            // onClick={onDelete}
             className="p-3 cursor-pointer text-sm w-full justify-start font-normal"
           >
             <Trash2 className="h-4 w-4 mr-2" />

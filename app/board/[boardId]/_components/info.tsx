@@ -1,14 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
-import { Poppins } from "next/font/google";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { UpdateModal } from "@/app/(dashboard)/_components/update-modal";
 import Hint from "@/components/hint";
+import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
+import { Poppins } from "next/font/google";
+import Image from "next/image";
+import Link from "next/link";
 
 interface InfoProps {
   boardId: string;
@@ -57,12 +58,18 @@ export const Info = ({ boardId }: InfoProps) => {
         </Button>
       </Hint>
       <TabSeparator />
-      <Button
-        variant="board"
-        className="text-base font-normal px-2"
+
+      <UpdateModal
+        id={data._id}
+        title={data.title}
       >
-        {data.title}
-      </Button>
+        <Button
+          variant="board"
+          className="text-base font-normal px-2"
+        >
+          {data.title}
+        </Button>
+      </UpdateModal>
     </div>
   );
 };
