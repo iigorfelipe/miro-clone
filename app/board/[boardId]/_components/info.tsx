@@ -1,12 +1,14 @@
 "use client";
 
 import { UpdateModal } from "@/app/(dashboard)/_components/update-modal";
+import Actions from "@/components/actions";
 import Hint from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
+import { Menu } from "lucide-react";
 import { Poppins } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -63,13 +65,41 @@ export const Info = ({ boardId }: InfoProps) => {
         id={data._id}
         title={data.title}
       >
-        <Button
-          variant="board"
-          className="text-base font-normal px-2"
+        <Hint
+          label="Edit title"
+          side="bottom"
+          sideOffset={10}
         >
-          {data.title}
-        </Button>
+          <Button
+            variant="board"
+            className="text-base font-normal px-2"
+          >
+            {data.title}
+          </Button>
+        </Hint>
       </UpdateModal>
+        
+      <TabSeparator />
+
+      <Actions
+        id={data._id}
+        title={data.title}
+        side="bottom"
+        sideOffset={10}
+      >
+        <div>
+          <Hint
+            label="Main menu"
+            side="bottom"
+            sideOffset={10}
+          >
+            <Button size="icon" variant="board">
+              <Menu />
+            </Button>
+          </Hint>
+        </div>
+
+      </Actions>
     </div>
   );
 };
