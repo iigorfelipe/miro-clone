@@ -61,23 +61,12 @@ export const Info = ({ boardId }: InfoProps) => {
       </Hint>
       <TabSeparator />
 
-      <UpdateModal
-        id={data._id}
-        title={data.title}
+      <Button
+        variant="board"
+        className="text-base font-normal px-2"
       >
-        <Hint
-          label="Edit title"
-          side="bottom"
-          sideOffset={10}
-        >
-          <Button
-            variant="board"
-            className="text-base font-normal px-2"
-          >
-            {data.title}
-          </Button>
-        </Hint>
-      </UpdateModal>
+        {data.title}
+      </Button>
         
       <TabSeparator />
 
