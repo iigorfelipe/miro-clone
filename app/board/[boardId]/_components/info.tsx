@@ -2,7 +2,7 @@
 
 import { UpdateModal } from "@/app/(dashboard)/_components/update-modal";
 import Actions from "@/components/actions";
-import Hint from "@/components/hint";
+import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";

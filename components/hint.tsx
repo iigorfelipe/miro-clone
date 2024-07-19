@@ -15,7 +15,7 @@ export interface HinProps {
   alignOffset?: number; 
 };
 
-const Hint = ({
+export const Hint = ({
   label,
   children,
   side,
@@ -47,5 +47,3 @@ const Hint = ({
     </TooltipProvider>
   );
 };
-
-export default Hint;
