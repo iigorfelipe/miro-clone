@@ -12,7 +12,7 @@ import { Camera, CanvasMode, CanvasState, Color, LayerType, Point } from "@/type
 import { LiveObject } from "@liveblocks/client";
 import { TextCursor } from "lucide-react";
 import { nanoid } from "nanoid";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { CursorPresence } from "./cursors-presence";
 import { Info } from "./info";
 import { Participants } from "./participants";
@@ -37,9 +37,8 @@ const Canvas = ({ boardId }: CanvasProps) => {
     g: 0,
     b: 0
   });
-  const [isDragging, setIsDragging] = useState(false);
-  const [startDragPos, setStartDragPos] = useState<Point>({ x: 0, y: 0 });
-  const [startCameraPos, setStartCameraPos] = useState<Camera>({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+  const lastMousePosition = useRef<Point>({ x: 0, y: 0 });
 
   const history = useHistory();
   const canUndo = useCanUndo();
@@ -75,7 +74,7 @@ const Canvas = ({ boardId }: CanvasProps) => {
 
   const onWheel = useCallback((e: React.WheelEvent) => {
     setCamera((camera) => ({
-      x: camera.x - e.deltaX,
+      x: camera.x,
       y: camera.y - e.deltaY,
     }));
   }, []);
@@ -87,31 +86,68 @@ const Canvas = ({ boardId }: CanvasProps) => {
 
     setMyPresence({ cursor: current });
 
-    if (isDragging) {
-      const deltaX = e.clientX - startDragPos.x;
-      const deltaY = e.clientY - startDragPos.y;
-      setCamera({
-        x: startCameraPos.x + deltaX,
-        y: startCameraPos.y + deltaY,
-      });
+    if (isDragging.current) {
+      setCamera((camera) => ({
+        x: camera.x + (e.clientX - lastMousePosition.current.x),
+        y: camera.y + (e.clientY - lastMousePosition.current.y),
+      }));
+      lastMousePosition.current = { x: e.clientX, y: e.clientY };
     }
-  }, [camera, isDragging, startDragPos, startCameraPos]);
-
-  const onPointerDown = useCallback((e: React.PointerEvent) => {
-    setIsDragging(true);
-    setStartDragPos({ x: e.clientX, y: e.clientY });
-    setStartCameraPos(camera);
   }, [camera]);
 
-  const onPointerUp = useCallback((e: React.PointerEvent) => {
-    setIsDragging(false);
+  const onPointerUp = useMutation(({ setMyPresence }, e: React.PointerEvent) => {
+    isDragging.current = false;
+    setMyPresence({ cursor: null });
+
+    const point = pointerEventToCanvasPoint(e, camera);
+
+    if (canvasState.mode === CanvasMode.Inserting) {
+      insertLayer(canvasState.layerType, point);
+    } else {
+      setCanvasState({
+        mode: CanvasMode.None,
+      });
+    };
+
+    history.resume();
+  }, [
+    camera,
+    canvasState,
+    history,
+    insertLayer
+  ]);
+
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    if (e.button === 1) {
+      isDragging.current = true;
+      lastMousePosition.current = { x: e.clientX, y: e.clientY };
+    }
   }, []);
 
   const onPointerLeave = useMutation(({ setMyPresence }) => {
     setMyPresence({ cursor: null });
-    setIsDragging(false);
+    isDragging.current = false;
   }, []);
 
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    const moveStep = 10;
+    if (e.key === "ArrowUp") {
+      setCamera((camera) => ({ ...camera, y: camera.y - moveStep }));
+    } else if (e.key === "ArrowDown") {
+      setCamera((camera) => ({ ...camera, y: camera.y + moveStep }));
+    } else if (e.key === "ArrowLeft") {
+      setCamera((camera) => ({ ...camera, x: camera.x - moveStep }));
+    } else if (e.key === "ArrowRight") {
+      setCamera((camera) => ({ ...camera, x: camera.x + moveStep }));
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onKeyDown]);
 
   return (
     <main
