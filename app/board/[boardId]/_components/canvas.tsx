@@ -37,6 +37,9 @@ const Canvas = ({ boardId }: CanvasProps) => {
     g: 0,
     b: 0
   });
+  const [isDragging, setIsDragging] = useState(false);
+  const [startDragPos, setStartDragPos] = useState<Point>({ x: 0, y: 0 });
+  const [startCameraPos, setStartCameraPos] = useState<Camera>({ x: 0, y: 0 });
 
   const history = useHistory();
   const canUndo = useCanUndo();
@@ -82,33 +85,31 @@ const Canvas = ({ boardId }: CanvasProps) => {
 
     const current = pointerEventToCanvasPoint(e, camera);
 
-    setMyPresence({ cursor: current })
-  }, []);
+    setMyPresence({ cursor: current });
 
-  const onPointerUp = useMutation((
-    {},
-    e
-  ) => {
-    const point = pointerEventToCanvasPoint(e, camera);
-
-    if (canvasState.mode === CanvasMode.Inserting) {
-      insertLayer(canvasState.layerType, point);
-    } else {
-      setCanvasState({
-        mode: CanvasMode.None,
+    if (isDragging) {
+      const deltaX = e.clientX - startDragPos.x;
+      const deltaY = e.clientY - startDragPos.y;
+      setCamera({
+        x: startCameraPos.x + deltaX,
+        y: startCameraPos.y + deltaY,
       });
-    };
+    }
+  }, [camera, isDragging, startDragPos, startCameraPos]);
 
-    history.resume();
-  }, [
-    camera,
-    canvasState,
-    history,
-    insertLayer
-  ]);
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    setIsDragging(true);
+    setStartDragPos({ x: e.clientX, y: e.clientY });
+    setStartCameraPos(camera);
+  }, [camera]);
+
+  const onPointerUp = useCallback((e: React.PointerEvent) => {
+    setIsDragging(false);
+  }, []);
 
   const onPointerLeave = useMutation(({ setMyPresence }) => {
     setMyPresence({ cursor: null });
+    setIsDragging(false);
   }, []);
 
 
@@ -132,6 +133,7 @@ const Canvas = ({ boardId }: CanvasProps) => {
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
         onPointerUp={onPointerUp}
+        onPointerDown={onPointerDown}
       >
         <g
           style={{
