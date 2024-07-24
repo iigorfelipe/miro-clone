@@ -1,6 +1,6 @@
 "use client";
 
-import { connectionIdToColor, pointerEventToCanvasPoint } from "@/lib/utils";
+import { connectionIdToColor, pointerEventToCanvasPoint, resizeBounds } from "@/lib/utils";
 import {
   useCanRedo,
   useCanUndo,
@@ -9,7 +9,7 @@ import {
   useOthersMapped,
   useStorage
 } from "@/liveblocks.config";
-import { Camera, CanvasMode, CanvasState, Color, LayerType, Point } from "@/types/canvas";
+import { Camera, CanvasMode, CanvasState, Color, LayerType, Point, Side, XYWH } from "@/types/canvas";
 import { LiveObject } from "@liveblocks/client";
 import { TextCursor } from "lucide-react";
 import { nanoid } from "nanoid";
@@ -74,6 +74,41 @@ const Canvas = ({ boardId }: CanvasProps) => {
     setCanvasState({ mode: CanvasMode.None });
   }, [lastUsedColor]);
 
+  const resizeSelectedLayer = useMutation((
+    {  storage, self },
+    point: Point
+  ) => {
+    if (canvasState.mode !== CanvasMode.Resizing) {
+      return;
+    }
+
+    const bounds = resizeBounds(
+      canvasState.initialBounds,
+      canvasState.corner,
+      point,
+    );
+
+    const liveLayers = storage.get("layers");
+    const layer = liveLayers.get(self.presence.selecion[0]);
+
+    if (layer) {
+      layer.update(bounds);
+    };
+
+  }, [canvasState]);
+
+  const onResizeHandlePointerDown = useCallback((
+    corner: Side,
+    initialBounds: XYWH
+  ) => {
+    history.pause();
+    setCanvasState({
+      mode: CanvasMode.Resizing,
+      initialBounds,
+      corner,
+    })
+  }, [history]);
+
   const onWheel = useCallback((e: React.WheelEvent) => {
     setCamera((camera) => ({
       x: camera.x,
@@ -86,6 +121,10 @@ const Canvas = ({ boardId }: CanvasProps) => {
 
     const current = pointerEventToCanvasPoint(e, camera);
 
+    if (canvasState.mode === CanvasMode.Resizing) {
+      resizeSelectedLayer(current);
+    }
+
     setMyPresence({ cursor: current });
 
     if (isDragging.current) {
@@ -95,7 +134,11 @@ const Canvas = ({ boardId }: CanvasProps) => {
       }));
       lastMousePosition.current = { x: e.clientX, y: e.clientY };
     }
-  }, [camera]);
+  }, [
+    camera,
+    canvasState,
+    resizeSelectedLayer,
+  ]);
 
   const onPointerUp = useMutation(({ setMyPresence }, e: React.PointerEvent) => {
     isDragging.current = false;
@@ -234,7 +277,7 @@ const Canvas = ({ boardId }: CanvasProps) => {
             ))
           }
           <SelectionBox
-            onResizeHandlePointerDown={() => {}}
+            onResizeHandlePointerDown={onResizeHandlePointerDown}
           />
           <CursorPresence />
         </g>
