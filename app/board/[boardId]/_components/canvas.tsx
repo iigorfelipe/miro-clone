@@ -13,13 +13,14 @@ import { Camera, CanvasMode, CanvasState, Color, LayerType, Point, Side, XYWH } 
 import { LiveObject } from "@liveblocks/client";
 import { TextCursor } from "lucide-react";
 import { nanoid } from "nanoid";
-import { useCallback, useState, useEffect, useRef, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CursorPresence } from "./cursors-presence";
 import { Info } from "./info";
-import { Participants } from "./participants";
-import { Toolbar } from "./toolbar";
 import { LayerPreview } from "./layer-preview";
+import { Participants } from "./participants";
 import { SelectionBox } from "./selection-box";
+import { SelectionTools } from "./selection-tools";
+import { Toolbar } from "./toolbar";
 
 const MAX_LAYERS = 100;
 
@@ -323,13 +324,17 @@ const Canvas = ({ boardId }: CanvasProps) => {
         undo={history.undo}
         redo={history.redo}
       />
+      <SelectionTools
+        camera={camera}
+        setLastUsedColor={setLastUsedColor}
+      />
       <svg
         className="h-[100vh] w-[100vw]"
         onWheel={onWheel}
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
         onPointerUp={onPointerUp}
-        // onPointerDown={onPointerDown2}
+        // onPointerDown={onPointerDown2} // TODO: remove
         onPointerDown={onPointerDown}
       >
         <g
