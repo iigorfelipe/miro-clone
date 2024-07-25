@@ -1,10 +1,15 @@
 "use client";
 
-import { memo } from "react";
-import { Camera, Color } from "@/types/canvas";
-import { useMutation, useSelf } from "@/liveblocks.config";
+import { Hint } from "@/components/hint";
+import { Button } from "@/components/ui/button";
+import { useDeleteLayers } from "@/hooks/use-delete-layers";
 import { useSelectionBounds } from "@/hooks/use-selection-bounds";
+import { useMutation, useSelf } from "@/liveblocks.config";
+import { Camera, Color } from "@/types/canvas";
+import { Trash2 } from "lucide-react";
+import { memo } from "react";
 import { ColorPicker } from "./color-picker";
+
 
 interface SelectionToolsProps {
   camera: Camera;
@@ -28,7 +33,9 @@ export const SelectionTools = memo(({
     selection.forEach((id) => {
       liveLayers.get(id)?.set("fill", fill);
     });
-  }, [selection,setLastUsedColor]);
+  }, [selection, setLastUsedColor]);
+
+  const deleteLayers = useDeleteLayers();
 
   const selectionBounds = useSelectionBounds();
 
@@ -52,6 +59,19 @@ export const SelectionTools = memo(({
       <ColorPicker
         onChange={setFill}
       />
+      <div
+        className="flex items-center pl-2 ml-2 border-l border-neutral-200"
+      >
+        <Hint label="Delete">
+          <Button
+            variant="board"
+            size="icon"
+            onClick={deleteLayers}
+          >
+            <Trash2 />
+          </Button>
+        </Hint>
+      </div>
     </div>
   )
 });
