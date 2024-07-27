@@ -1,5 +1,7 @@
 "use client";
 
+import { useDeleteLayers } from "@/hooks/use-delete-layers";
+import { useDisableScrollBounce } from "@/hooks/use-disable-scroll-bounce";
 import { colorToCss, connectionIdToColor, findIntersectingLayersWithRectangle, penPointsToPathLayer, pointerEventToCanvasPoint, resizeBounds } from "@/lib/utils";
 import {
   useCanRedo,
@@ -46,6 +48,7 @@ const Canvas = ({ boardId }: CanvasProps) => {
   const isDragging = useRef(false);
   const lastMousePosition = useRef<Point>({ x: 0, y: 0 });
 
+  useDisableScrollBounce();
   const history = useHistory();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
@@ -430,6 +433,32 @@ const Canvas = ({ boardId }: CanvasProps) => {
 
     return layerIdsToColorSelcetion;
   }, [selections])
+
+  const deleteLayers = useDeleteLayers();
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      switch (e.key) {
+        case "z": {
+          if (e.ctrlKey || e?.metaKey) {
+            if (e?.shiftKey) {
+              history.redo();
+            } else {
+              history.undo();
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+
+  }, [deleteLayers, history]);
 
   return (
     <main
