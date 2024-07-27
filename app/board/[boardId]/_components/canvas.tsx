@@ -235,13 +235,12 @@ const Canvas = ({ boardId }: CanvasProps) => {
 
     // TODO: Add case for drawing
 
-    setCanvasState({ origin: point, mode: CanvasMode.Pressing });
-
-    // TODO: onPointerDown2
     if (e.button === 1) {
       isDragging.current = true;
       lastMousePosition.current = { x: e.clientX, y: e.clientY };
+      return;
     }
+    setCanvasState({ origin: point, mode: CanvasMode.Pressing });
   }, [
     camera, canvasState.mode, setCanvasState
   ]);
