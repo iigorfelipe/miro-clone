@@ -1,5 +1,10 @@
 # Miro Clone
 
+- ### [Clique para ver a aplicação rodando](https://miro-clone-pearl.vercel.app/)
+
+<img src="https://github.com/user-attachments/assets/03f98a90-7461-44fc-b587-807acd3fa6c1" alt="board-gif">
+
+
 Este projeto é um clone do Miro, uma ferramenta colaborativa de quadro branco em tempo real, desenvolvido seguindo um tutorial de 10 horas do canal "Code With Antonio" no YouTube. O projeto inclui funcionalidades como banco de dados em tempo real, quadro branco com capacidade de adicionar formas (retângulos e elipses), notas adesivas e desenho com lápis. Utilizamos as tecnologias mais recentes, como Next.js 14, Clerk, Convex e LiveBlocks.
 
 ## Tecnologias Utilizadas
@@ -33,7 +38,6 @@ Este projeto é um clone do Miro, uma ferramenta colaborativa de quadro branco e
 <img src="https://github.com/user-attachments/assets/b868e6db-af46-438d-9634-96a236c21c58" alt="invitations">
 <img src="https://github.com/user-attachments/assets/5ab503c5-78d6-408d-9ec6-22e7e72b6404" alt="board-list">
 <img src="https://github.com/user-attachments/assets/043e4de3-5c45-4037-b92d-7a3f1d2b6a72" alt="board">
-<img src="https://github.com/user-attachments/assets/03f98a90-7461-44fc-b587-807acd3fa6c1" alt="board-gif">
 
 ## Referências
 
